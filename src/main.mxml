@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--  
+
+	Video Rating System
+	Created by Chris Hall, USANA Studios April 2009 chris.hall@us.usana.com
+	All Rights Reserved
+	updated 4/10/09 by Chris
+	
+	main.mxml
+
+ -->
+ 
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	backgroundGradientAlphas="[1.0, 1.0]" 
+	backgroundGradientColors="[#1B1B1B, #1B1B1B]" 
+	creationComplete="init(event)" 
+	xmlns:components="components.*">
+   
+   
+   <!-- Set the CSS -->
+   
+   <mx:Style>
+      .headingStyle {
+            fontFamily:Arial; 
+            fontSize: 60pt;
+            fontWeight: bold;
+            letterSpacing: -3;
+        }
+        
+       .pStyle {
+       	
+     		fontFamily:Arial; 
+            fontSize: 13pt;
+            leading: 10;
+
+       }
+       
+       @font-face{
+        src: url("assets/fonts/Calibri.ttf");
+        fontFamily: myMyriad;
+     }
+
+     AreaChart {
+        fontFamily: myMyriad;
+        fontSize: 11; 
+     }
+     
+     Alert {
+     background-color: #000000;	
+     border-color: #000000;
+     }
+    </mx:Style>
+    
+
+<mx:Script>
+	<![CDATA[
+	
+	//=================================================================================
+	//--- Import Classes
+	//=================================================================================
+	
+	import mx.controls.ProgressBar;
+	import modules.surveyForm;
+	import mx.controls.Text;
+	import flash.net.*;
+	import flash.events.*;
+	import flash.text.*;
+	import flash.utils.*;
+	import flash.display.*;
+	import mx.collections.ArrayCollection;
+	import com.GuN.UI.customUIComponent.slider.*;
+	import com.videoRating.utils.*;
+	import mx.controls.Alert;
+	import mx.managers.BrowserManager;
+    import mx.managers.IBrowserManager;
+    import mx.utils.URLUtil;
+    import mx.events.VideoEvent;
+    import mx.events.MetadataEvent;
+    //import fl.video.*;
+    //import fl.video.MetadataEvent;
+    
+    
+	//=================================================================================
+	//--- Variables
+	//=================================================================================
+	
+	[Bindable]
+	public var sampleProvider:String;
+	[Bindable]
+	public var userID:String = "";
+	public var _videoTime:Number;
+	[Bindable]
+	public var videoID:String = "";
+	public var URL:String = "http://www.usanamedia.com/uRate/";
+	
+	
+	
+	//public var email:String = "chris.hall@us.usana.com";
+	public var email:String = "market.research@us.usana.com";
+	
+	private var databaseRequest:URLRequest = new URLRequest("");
+	private var databaseLoader:URLLoader = new URLLoader();
+	private var databaseVars:URLVariables = new URLVariables();
+	
+	private var feedbackURL:String = "mailto:" + email;
+	private var feedbackRequest:URLRequest = new URLRequest(feedbackURL);
+	
+	private var finishedLink:String = new String();
+	private var _timeLimit:Number = 3;
+	private var currentTime:Number = 0;
+	[Bindable]
+	private var streamURL:String = "rtmp://cp74021.edgefcs.net/ondemand/";
+	[Bindable]
+	private var fileExt:String = ".flv";
+	private var _currentTime:Date;
+	private var URLParams:IBrowserManager;
+	private var _timeStamp:Date = new Date();
+	private var year:String = String(_timeStamp.fullYear);
+	private var month:String = String(_timeStamp.month);
+	private var day:String = String(_timeStamp.day);
+	private var hour:String = String(_timeStamp.hours);
+	private var seconds:String = String(_timeStamp.seconds);
+	private var milliseconds:String = String(_timeStamp.milliseconds);
+	private var randomNumber:Number = Math.floor(Math.random() * (1+99-10)) + 10; 
+	//private var uniqueID:String = String(videoID + year + month + day + hour + seconds + milliseconds +randomNumber);
+	private var uniqueID:String;
+	//private var playback:FLVPlayback = new FLVPlayback();
+	[Embed(source='assets/images/play.png')]
+	[Bindable]
+	public var imagePlay:Class; 
+	[Embed(source='assets/images/pause.png')]
+	[Bindable]
+	public var imagePause:Class;
+	[Bindable]
+	public var XMLData:XML;
+	[Bindable]
+	public var _XMLParents:String;
+	private var survey:String;	
+	private var multOf3:Array = [];
+	private var multOf5:Array = [];
+	[Bindable]
+	private var arrayValues:Array = ["null","One", "Two", "Three", "Four", "Five", "Six", "Seven"];
+	private var urlVarData:String = new String();
+	private var surveyString:String = new String();
+	private var videoURL:String = new String();
+	
+	[Bindable] public var _timestamp:String = new String();
+
+	// These are the survey variables
+	[Bindable] public var _age:String = new String();
+	[Bindable] public var _gender:String = new String();
+	[Bindable] public var _residence:String = new String();
+	[Bindable] public var _race:String = new String();
+	[Bindable] public var _zip:String = new String();
+	[Bindable] public var _results:String = new String();
+	
+	
+	
+	
+	//=================================================================================
+	//--- Initial Method
+	//=================================================================================
+	
+	private function init(event:Event):void
+	{
+			// Pulls the video and user from the URL
+			URLParams = BrowserManager.getInstance();                
+            URLParams.init("", "uRate: USANA's Online Video Rating Tool");
+            var params:Object = URLUtil.stringToObject(URLParams.fragment, "&"); 
+
+			// Checks to make sure parameters are there
+			if (params.video == undefined || params.video == "") { Alert.show("Video is Undefined") } else { videoID = params.video; }
+			//videoID = "test";
+			
+			if (params.sp == undefined || params.sp == "") { sampleProvider = "USANA";} else {sampleProvider = params.sp;} 
+			
+			if (params.user == undefined || params.user == "") {userID = String(videoID + year + month + day + hour + seconds + milliseconds + randomNumber);} else {userID = params.user;}
+				
+				
+				
+				var loader:URLLoader = new URLLoader(); 
+				loader.addEventListener(Event.COMPLETE, loadXML); 
+				loader.load(new URLRequest("http://usana.edgeboss.net/flash/usana/rating/" + videoID + ".flv")); 
+				
+				
+			
+           // This sets the initial parameters of the XML
+           _XMLParents = "<results video='" + videoID +"' timestamp='" + year + month + day + hour + seconds + milliseconds + "' userID='" + userID + "' sampleProvider='" + sampleProvider + "'></results>";
+			XMLData = XML(_XMLParents);
+			urlVarData = "video=" + videoID + "&timestamp=" + year + month + day + hour + seconds + milliseconds + "&userID=" + userID + "&sampleProvider=" + sampleProvider + "&";
+			_timestamp=year + month + day + hour + seconds + milliseconds;
+			// Creates the multiples of 3 and 5 for recording video data
+			var i:uint;
+			for (i=0; i<1000; i++)
+			{
+			   multOf3.push(3*i);
+			   multOf5.push(5*i);
+			}
+			
+	}
+	
+      private function loadXML(e:Event):void
+      {
+      	var xmlData:XML =  new XML(e.target.data);
+        videoURL = ParseXML(xmlData);   
+
+      }
+
+	private function ParseXML(item:XML):String
+	{
+		return String(item.streamName);
+	}
+	
+
+
+	
+	
+	//=================================================================================
+	//--- Saves the Survey portion so we can use it if they want to re-do the video
+	//=================================================================================
+	
+	public function recordSurvey(data:XML, string:String):void
+	{
+		urlVarData += string + "results=";
+		surveyString = string + "results=";
+		survey = String(data);
+		XMLData = data;
+		appStack.selectedChild=tutorial;
+	}
+	
+	
+	//=================================================================================
+	//--- Inititates the video player
+	//=================================================================================
+	
+	private function createFLVPlayer():void
+	{
+		/* // FLVPlayback compontent
+		
+		playback.width = 320;
+		playback.height = 240;
+		videoPlayer.addChild( playback );
+		playback.source = streamURL + videoID + fileExt;
+		playback.scaleMode = VideoScaleMode.MAINTAIN_ASPECT_RATIO;
+		playback.skin = "assets/skin/SkinUnderPlaySeekMute.swf";
+		playback.bufferingBarHidesAndDisablesOthers = true;
+		playback.skinBackgroundAlpha = .3;
+		playback.skinBackgroundColor = 0x000000;
+		playback.autoPlay = false;
+		playback.bufferTime = Math.round(_videoTime * .10);
+		playback.addEventListener(VideoEvent.PLAYHEAD_UPDATE, updatePlayhead);
+		playback.addEventListener(VideoEvent.COMPLETE, videoComplete);
+		playback.addEventListener(MetadataEvent.METADATA_RECEIVED, getDuration);*/
+		videoPlayer.source = streamURL + videoURL;
+		videoPlayer.bufferTime = Math.round(_videoTime * .10);
+		videoPlayer.load();
+		
+	}
+	
+	
+	//=================================================================================
+	//--- Gets the total video time
+	//=================================================================================
+	
+	private function getDuration(event:MetadataEvent):void
+	{
+		_videoTime = event.info.duration;
+		 var pTime:Date = new Date(videoPlayer.playheadTime * 1000 || 10);
+         var tTime:Date = new Date(videoPlayer.totalTime * 1000);
+         playheadTime.text = dateFormatter.format(pTime) + " / " + dateFormatter.format(tTime);
+	}
+	
+	
+	//=================================================================================
+	//--- Play/pause video
+	//=================================================================================
+	
+	public function playPauseVideo():void {
+                if (videoPlayer.playing) {
+                    videoPlayer.pause();
+                    playPause.setStyle("icon",imagePlay);
+
+
+                } else {
+                    videoPlayer.play();
+                    playPause.setStyle("icon",imagePause);
+
+
+                }
+            }
+	
+	
+	
+	//=================================================================================
+	//--- Runs 4 times per second. uses the _timeLimit variable to decide whether or not to
+	//--  record every 3 secnds of the video or every 5 seconds
+	//=================================================================================
+	
+	private function updatePlayhead(event:VideoEvent):void
+	{
+		 var newTime:Number = Math.round(event.playheadTime);
+		 var pTime:Date = new Date(videoPlayer.playheadTime * 1000 || 10);
+         var tTime:Date = new Date(videoPlayer.totalTime * 1000);
+         playheadTime.text = dateFormatter.format(pTime) + " / " + dateFormatter.format(tTime);
+		
+		//checks to make sure the time isn't zero
+		if (newTime <= 1) {
+		
+		// checks to see if the video is > < the time limit	
+		} else if (_videoTime <= _timeLimit*60) {
+		
+		// If under the time limit
+		var isMultof3:Boolean = false;
+		
+			var i:uint;
+			for (i=0; i<multOf3.length; i++)
+			{
+			   if (newTime == multOf3[i]) {
+			   
+			   isMultof3 = true
+			   if (newTime != currentTime && isMultof3 == true) {
+
+				recordData(formatTime(event.playheadTime), newTime);
+				currentTime = newTime;
+				
+
+			   
+			   } else {
+			   
+			   isMultof3 = false
+			   
+			   }
+			   
+			}
+				
+		}
+		
+		// is over the time limit
+		} else {
+			
+			var isMultof5:Boolean = false;
+		
+			var j:uint;
+			for (j=0; j<multOf5.length; j++)
+			{
+			   if (newTime == multOf5[j]) {
+			   
+			   isMultof5 = true
+			   if (newTime != currentTime && isMultof5 == true) {
+				
+				recordData(formatTime(event.playheadTime), newTime);
+				currentTime = newTime;
+				
+				
+			   
+			   } else {
+			   
+			   isMultof5 = false
+			   
+			   }
+			   
+			}
+				
+		}
+			
+			
+		}
+		
+	}
+
+
+	//=================================================================================
+	//--- Called when the user wants to retake the video portion
+	//=================================================================================
+	
+	private function doOver():void
+	{
+		appStack.selectedChild=videoScreen;
+		urlVarData = surveyString;
+		XMLData = XML(survey);
+		hSlider.value = 4;
+		videoPlayer.playheadTime = 0;
+		videoPlayer.play();
+		playPauseVideo();
+		
+	}
+	
+	
+	//=================================================================================
+	//--- When the video completes
+	//=================================================================================
+	
+	private function videoComplete(event:VideoEvent):void
+	{
+		videoPlayer.stop();
+		appStack.selectedChild=chartScreen;
+		
+		
+	}
+	
+	
+	//=================================================================================
+	//--- Sends the XML data to the sendEmail Class
+	//=================================================================================
+	
+	private function sendResults():void
+	{
+		
+		uniqueID = userID;
+		//finishedLink = "http://www.e-rewards.com/complete.do?ftouch=" + userID;
+		finishedLink = "http://usanahf.questionpro.com";
+		
+		// Writes an XML file to server and sends and email notification
+		var emailResults:sendEmail = new sendEmail();
+		//emailResults.dispatch(uniqueID);
+		
+		emailResults.sendDatabase();
+		
+		
+	}
+	
+	private function onIOError(evt:IOErrorEvent):void 
+	{
+		Alert.show("An error occurred when attempting to write the XML.\n" + evt.text);
+	}
+	
+	private function onComplete(evt:Event):void 
+	{
+		
+    }
+	
+	
+	//=================================================================================
+	//--- Called from sendEmail class when the data has been sent
+	//=================================================================================
+	
+	public function sendComplete():void {
+		var finishedRequest:URLRequest = new URLRequest(finishedLink);
+		navigateToURL(finishedRequest, "_self");
+		//appStack.selectedChild=thankYou;
+		
+	}
+	
+	
+	//=================================================================================
+	//--- Inititates chart
+	//=================================================================================
+	
+	private function initChartData():void
+	{
+		chart.dataProvider = XMLData.snapshot;
+		
+
+	}
+			
+			
+	//=================================================================================
+	//--- Called by playhead update. adds info to the XML data
+	//=================================================================================
+	
+	private function recordData(timeElapsed:String, rawTime:Number):void
+	{
+		var roundedValue:Number = Math.round(hSlider.value);
+		var ratingValue:String = String(roundedValue);
+		var _newChild:String = '<snapshot time="' + timeElapsed + '" rating="' + ratingValue + '"/>';
+		var _newXMLChild:XML = XML(_newChild);
+		
+		XMLData.appendChild(_newXMLChild);
+		urlVarData += rawTime.toString() + ":" + ratingValue + ",";
+		_results += rawTime.toString() + ":" + ratingValue + ",";
+
+							
+	}
+			
+	private function formatTime(value:int):String
+	{
+		var result:String = (value % 60).toString();
+				
+		if (result.length == 1)
+			result = Math.floor(value / 60).toString() + ":0" + result;
+		else 
+			result = Math.floor(value / 60).toString() + ":" + result;
+			return result;
+	}
+	
+	
+	//=================================================================================
+	//--- Listens for video buffering
+	//=================================================================================
+	
+	private function videoDisplay_stateChange(evt:VideoEvent):void {
+               		switch (evt.state) {
+               			
+                   	case VideoEvent.BUFFERING:
+                    //evt.currentTarget.visible = false;
+                    playheadTime.text = "BUFFERING";
+                    playPause.enabled = false;
+                    break;
+                    
+                    case VideoEvent.PLAYING:
+                    //evt.currentTarget.visible = false;
+                     playPause.enabled = true;
+                    break;
+               }
+            }
+	
+	
+	
+		
+	]]>
+</mx:Script>
+
+
+<!--  Slides the chart up  -->
+<mx:SeriesSlide id="slider" duration="2000" direction="up" />
+
+<!--  Formats the video time  -->
+<mx:DateFormatter id="dateFormatter" formatString="NN:SS" />
+
+<!--  Styles the chart background  -->
+<mx:Array id="chartBackground">
+     <mx:GridLines verticalChangeCount="1" direction="horizontal" >
+     
+        <mx:horizontalStroke>
+           <mx:Stroke weight="1" alpha=".10" color="0xFFFFFF"/>
+        </mx:horizontalStroke>
+        
+        <mx:horizontalFill>
+           <mx:SolidColor color="0x000000" alpha=".10"/>
+        </mx:horizontalFill>
+        
+     </mx:GridLines>
+  </mx:Array>
+
+
+
+<!--  Starts the Application  -->
+<mx:ViewStack id="appStack" width="100%" height="100%">
+
+	<mx:Canvas id="surveyScreen" >
+	
+		<mx:Panel id="surveyPanel" height="700" paddingLeft="25" x="0" y="0" backgroundAlpha="0" borderStyle="none">
+		
+		<mx:Text styleName="headingStyle" text="Tell us a little about yourself." color="0xFFFFFF" />
+		
+		<mx:HBox paddingTop="25" horizontalGap="20">
+			
+			<mx:Box cornerRadius="8" borderStyle="solid" borderThickness="0" backgroundColor="0x111111" paddingTop="18" paddingBottom="18" paddingLeft="18" paddingRight="18">
+				
+			<mx:Text width="250" color="0xbbbbbb" styleName="pStyle" text="Welcome to uRate, USANA’s online video rating system. Please disable all popup blockers, complete the short survey and click Continue. " />
+			
+			</mx:Box>
+		
+			<mx:ModuleLoader id="surveyModule" url="modules/surveyForm.swf"/>
+			
+			<!--<mx:Button id="skip" click="{appStack.selectedChild = tutorial}" label="Skip this crap"/>-->
+			
+			
+			</mx:HBox>
+			
+		</mx:Panel>
+	
+	</mx:Canvas>
+	
+	<mx:Canvas id="tutorial" width="100%" >
+	
+	<mx:Panel id="tutorialPanel" layout="absolute" width="100%" backgroundAlpha="0" borderStyle="none" >
+	
+			<mx:VBox id="tutBox" x="{(tutorialPanel.width/2-tutBox.width/2)}" y="50">
+			
+			<mx:SWFLoader id="tutSWF" source="assets/swf/tutorial.swf" />
+	
+					<mx:Text textAlign="center" fontSize="14" text="As you watch a video drag the slider as shown above. Dragging to the right indicates you like what you see while dragging to the left indicates dislike. You must use the slider to receive credit for viewing the video. Click Continue to begin." color="0xFFFFFF" width="{tutSWF.width}" />
+				
+					<mx:Spacer height="25" />
+				
+			</mx:VBox>
+			
+		</mx:Panel>
+		
+	<mx:Image source="assets/images/continue_button.png" buttonMode="true" useHandCursor="true" click="{appStack.selectedChild=videoScreen}" horizontalCenter="0" y="385" />
+		
+	</mx:Canvas>
+
+	<mx:Canvas id="videoScreen" width="100%">
+		
+		<mx:VBox id="videoPanel" creationComplete="createFLVPlayer()" width="100%">
+			
+				<mx:Panel layout="absolute" width="100%" backgroundAlpha="0" borderStyle="none" height="700" >
+				
+				<!--<mx:UIComponent includeInLayout="true" x="{(videoPanel.width/2-videoPlayer.width/2) - 25}" id="videoPlayer" width="320" height="280" />-->
+				
+
+					<mx:Panel id="panel" horizontalCenter="0" borderColor="0x000000" borderAlpha=".3">
+
+				    <mx:VideoDisplay id="videoPlayer" 
+				            playheadUpdate="updatePlayhead(event)"
+				            autoPlay="false" 
+				            metadataReceived="getDuration(event)"
+				            stateChange="videoDisplay_stateChange(event)" 
+				            complete="videoComplete(event)"
+				            height="240" 
+				            width="320"
+				            />
+				            
+				            <mx:ControlBar>         
+				            <mx:Button id="playPause" fillAlphas="{[0.1,0.1]}" borderColor="0x222222" useHandCursor="true" buttonMode="true" color="0x000000" icon="@Embed(source='assets/images/play.png')" click="playPauseVideo()" />
+				            <mx:Spacer width="100%" />
+				            <mx:Label id="playheadTime" fontWeight="bold" color="0xFFFFFF"/>
+				        </mx:ControlBar>
+				        
+				    </mx:Panel>
+				
+
+				<mx:Spacer height="25" />
+				
+					<mx:HBox horizontalCenter="0" y="{videoPlayer.y + 330}">
+						
+						<mx:Text color="0xFFFFFF" text="Dislike" fontSize="14" />
+					
+						<mx:Image source="assets/images/ratingScale.png" />
+					
+					<mx:Text color="0xFFFFFF" text="Like" fontSize="14" />
+					
+					</mx:HBox>
+					
+				<mx:HSlider id="hSlider"
+						showDataTip="false" 
+						buttonMode="true"
+						values="{arrayValues}"
+						creationComplete="{hSlider.value=4}"
+						
+						minimum="1"
+						maximum="{arrayValues.length-1}"
+						liveDragging="true" 
+						trackSkin="{SliderTrack}"
+						sliderThumbClass="{CSpSliderThumb}" 
+						useHandCursor="true"
+						width="500" horizontalCenter="0" y="{videoPlayer.y + 400}"
+						/>
+				
+				<mx:Text textAlign="center" fontSize="12" text="Please wait while the video loads. This may take several minutes depending on the length of the video. When the video is loaded, press the play button to rate it." color="0xFFFFFF" x="{hSlider.x}" y="{hSlider.y + 55}" width="500" />
+		
+		
+				</mx:Panel>
+				
+				
+		</mx:VBox>
+			
+	</mx:Canvas>
+	
+	<mx:Canvas id="chartScreen" creationComplete="initChartData()">
+	
+  <mx:Panel width="100%" color="0xFFFFFF" backgroundAlpha="0" borderStyle="none" paddingBottom="25" paddingLeft="35" paddingRight="35" paddingTop="25">
+  
+  <mx:Text styleName="headingStyle" text="Your Results" color="0xFFFFFF" />
+  
+     <mx:AreaChart id="chart" width="100%" showDataTips="true" backgroundElements="{chartBackground}" dataProvider="{XMLData.snapshot}" height="250" >
+
+        <mx:horizontalAxis>
+           <mx:CategoryAxis id="h1" categoryField="@time" title="Time"/>
+        </mx:horizontalAxis>
+       
+       <mx:verticalAxis>
+            <mx:LinearAxis minimum="0" maximum="7" title="Rating" />
+        </mx:verticalAxis>
+
+   
+        <mx:horizontalAxisRenderers>
+           <mx:AxisRenderer labelRotation="45" axis="{h1}" >
+             </mx:AxisRenderer>
+        </mx:horizontalAxisRenderers> 
+        
+        
+        <mx:series>
+		   <mx:AreaSeries yField="@rating" displayName="Rating" showDataEffect="{slider}" >
+		  
+                <mx:areaFill>
+                <mx:LinearGradient angle="90">
+                    <mx:entries>
+                        <mx:GradientEntry 
+                            color="0x3db7fd" 
+                            ratio="0"
+                            alpha="1"
+                        />
+                        <mx:GradientEntry 
+                            color="0x03375c" 
+                            ratio="1"
+                            alpha="1"
+                        />
+                 
+                    </mx:entries>
+                </mx:LinearGradient>
+            </mx:areaFill>
+
+		   </mx:AreaSeries>    
+        </mx:series>
+        
+     </mx:AreaChart>
+     
+     <mx:Spacer height="25" />
+     
+     <mx:HBox>
+     <mx:Spacer width="25" />
+     	<mx:Image source="assets/images/do-over.png" buttonMode="true" useHandCursor="true" click="doOver()" />
+     	
+     	<mx:Image source="assets/images/submit.png" buttonMode="true" useHandCursor="true" click="sendResults()" />
+     </mx:HBox>
+     
+
+     
+  </mx:Panel>
+  
+	</mx:Canvas>
+	
+	<mx:Canvas id="thankYou">
+	
+	<mx:Panel width="100%" height="700" paddingLeft="25" x="0" y="0" backgroundAlpha="0" borderStyle="none">
+	
+			<mx:Text styleName="headingStyle" text="Thank you!" color="0xFFFFFF" />
+			
+			<mx:Box cornerRadius="8" borderStyle="solid" borderThickness="0" backgroundColor="0x111111" paddingTop="18" paddingBottom="18" paddingLeft="18" paddingRight="18">
+				
+			<mx:Text width="450" color="0xbbbbbb" styleName="pStyle" text="Thank you for rating the USANA video. Your valuable feedback will help USANA produce the best videos possible. " />
+			
+			</mx:Box>
+		<mx:Spacer height="25" />
+		<mx:Image source="assets/images/feedback.png" buttonMode="true" useHandCursor="true" click="navigateToURL(feedbackRequest, '_self')" />
+		
+		</mx:Panel>
+		
+	</mx:Canvas>
+	
+</mx:ViewStack>
+	
+	
+</mx:Application>

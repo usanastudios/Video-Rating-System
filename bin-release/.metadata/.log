@@ -1,0 +1,92 @@
+!SESSION 2009-04-10 14:06:35.116 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.5.0_16
+java.vendor=Apple Inc.
+BootLoader constants: OS=macosx, ARCH=ppc, WS=carbon, NL=en_US
+Command-line arguments:  -os macosx -ws carbon -arch ppc -data /Users/chrishall/Documents/Projects/Video Rating System/src
+
+!ENTRY org.eclipse.ui.workbench 2 0 2009-04-10 14:06:42.690
+!MESSAGE A handler conflict occurred.  This may disable some commands.
+!SUBENTRY 1 org.eclipse.ui.workbench 2 0 2009-04-10 14:06:42.690
+!MESSAGE Conflict for 'AUTOGEN:::org.cfeclipse.cfml.mappings/org.cfeclipse.cfml.setMapping':
+HandlerActivation(commandId=AUTOGEN:::org.cfeclipse.cfml.mappings/org.cfeclipse.cfml.setMapping,
+	handler=ActionDelegateHandlerProxy(null,org.cfeclipse.cfml.ui.actions.SetMappingAction),
+	expression=WorkbenchWindowExpression(org.eclipse.ui.internal.WorkbenchWindow@6598b),sourcePriority=16384)
+HandlerActivation(commandId=AUTOGEN:::org.cfeclipse.cfml.mappings/org.cfeclipse.cfml.setMapping,
+	handler=ActionDelegateHandlerProxy(null,org.cfeclipse.cfml.ui.actions.SetMappingAction),
+	expression=WorkbenchWindowExpression(org.eclipse.ui.internal.WorkbenchWindow@6598b),sourcePriority=16384)
+!SUBENTRY 1 org.eclipse.ui.workbench 2 0 2009-04-10 14:06:42.690
+!MESSAGE Conflict for 'AUTOGEN:::org.cfeclipse.cfml.frameworks.contribution1/org.cfeclipse.cfml.frameworks.newAction':
+HandlerActivation(commandId=AUTOGEN:::org.cfeclipse.cfml.frameworks.contribution1/org.cfeclipse.cfml.frameworks.newAction,
+	handler=ActionDelegateHandlerProxy(null,org.cfeclipse.cfml.frameworks.popup.actions.SetFrameworkFile),
+	expression=WorkbenchWindowExpression(org.eclipse.ui.internal.WorkbenchWindow@6598b),sourcePriority=16384)
+HandlerActivation(commandId=AUTOGEN:::org.cfeclipse.cfml.frameworks.contribution1/org.cfeclipse.cfml.frameworks.newAction,
+	handler=ActionDelegateHandlerProxy(null,org.cfeclipse.cfml.frameworks.popup.actions.SetAsConfigFolder),
+	expression=WorkbenchWindowExpression(org.eclipse.ui.internal.WorkbenchWindow@6598b),sourcePriority=16384)
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:06:43.143
+!MESSAGE System property http.proxyHost has been set to proxy1.usana.com by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:06:43.144
+!MESSAGE System property http.proxyPort has been set to 8080 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:06:43.147
+!MESSAGE System property http.nonProxyHosts has been set to usana.com|*.usana.com|slc-exch5.usana.com|*.slc-exch5.usana.com|slc-internet2.usana.com|*.slc-internet2.usana.com|www.usana.com|*.www.usana.com|usananet.usana.com|*.usananet.usana.com|slc-dc5|*.slc-dc5 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:06:43.150
+!MESSAGE System property https.proxyHost has been set to proxy1.usana.com by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:06:43.150
+!MESSAGE System property https.proxyPort has been set to 8080 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:06:43.151
+!MESSAGE System property socksProxyHost has been set to proxy1.usana.com by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:06:43.152
+!MESSAGE System property socksProxyPort has been set to 8080 by an external source. This value will be overwritten using the values from the preferences
+!SESSION 2009-04-10 14:07:08.928 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.5.0_16
+java.vendor=Apple Inc.
+BootLoader constants: OS=macosx, ARCH=ppc, WS=carbon, NL=en_US
+Command-line arguments:  -os macosx -ws carbon -arch ppc
+
+!ENTRY org.eclipse.ui.workbench 2 0 2009-04-10 14:07:18.033
+!MESSAGE A handler conflict occurred.  This may disable some commands.
+!SUBENTRY 1 org.eclipse.ui.workbench 2 0 2009-04-10 14:07:18.033
+!MESSAGE Conflict for 'AUTOGEN:::org.cfeclipse.cfml.mappings/org.cfeclipse.cfml.setMapping':
+HandlerActivation(commandId=AUTOGEN:::org.cfeclipse.cfml.mappings/org.cfeclipse.cfml.setMapping,
+	handler=ActionDelegateHandlerProxy(null,org.cfeclipse.cfml.ui.actions.SetMappingAction),
+	expression=WorkbenchWindowExpression(org.eclipse.ui.internal.WorkbenchWindow@e3a4c7),sourcePriority=16384)
+HandlerActivation(commandId=AUTOGEN:::org.cfeclipse.cfml.mappings/org.cfeclipse.cfml.setMapping,
+	handler=ActionDelegateHandlerProxy(null,org.cfeclipse.cfml.ui.actions.SetMappingAction),
+	expression=WorkbenchWindowExpression(org.eclipse.ui.internal.WorkbenchWindow@e3a4c7),sourcePriority=16384)
+!SUBENTRY 1 org.eclipse.ui.workbench 2 0 2009-04-10 14:07:18.033
+!MESSAGE Conflict for 'AUTOGEN:::org.cfeclipse.cfml.frameworks.contribution1/org.cfeclipse.cfml.frameworks.newAction':
+HandlerActivation(commandId=AUTOGEN:::org.cfeclipse.cfml.frameworks.contribution1/org.cfeclipse.cfml.frameworks.newAction,
+	handler=ActionDelegateHandlerProxy(null,org.cfeclipse.cfml.frameworks.popup.actions.SetFrameworkFile),
+	expression=WorkbenchWindowExpression(org.eclipse.ui.internal.WorkbenchWindow@e3a4c7),sourcePriority=16384)
+HandlerActivation(commandId=AUTOGEN:::org.cfeclipse.cfml.frameworks.contribution1/org.cfeclipse.cfml.frameworks.newAction,
+	handler=ActionDelegateHandlerProxy(null,org.cfeclipse.cfml.frameworks.popup.actions.SetAsConfigFolder),
+	expression=WorkbenchWindowExpression(org.eclipse.ui.internal.WorkbenchWindow@e3a4c7),sourcePriority=16384)
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:07:18.467
+!MESSAGE System property http.proxyHost has been set to proxy1.usana.com by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:07:18.468
+!MESSAGE System property http.proxyPort has been set to 8080 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:07:18.469
+!MESSAGE System property http.nonProxyHosts has been set to usana.com|*.usana.com|slc-exch5.usana.com|*.slc-exch5.usana.com|slc-internet2.usana.com|*.slc-internet2.usana.com|www.usana.com|*.www.usana.com|usananet.usana.com|*.usananet.usana.com|slc-dc5|*.slc-dc5 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:07:18.471
+!MESSAGE System property https.proxyHost has been set to proxy1.usana.com by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:07:18.471
+!MESSAGE System property https.proxyPort has been set to 8080 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:07:18.473
+!MESSAGE System property socksProxyHost has been set to proxy1.usana.com by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.net 1 0 2009-04-10 14:07:18.476
+!MESSAGE System property socksProxyPort has been set to 8080 by an external source. This value will be overwritten using the values from the preferences

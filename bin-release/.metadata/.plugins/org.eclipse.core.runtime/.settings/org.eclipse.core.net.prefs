@@ -1,0 +1,6 @@
+#Fri Apr 10 14:06:43 MDT 2009
+proxyData/HTTP/hasAuth=false
+proxyData/HTTP/host=proxy1.usana.com
+org.eclipse.core.net.hasMigrated=true
+eclipse.preferences.version=1
+proxyData/HTTP/port=8080

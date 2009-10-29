@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+	 <mx:Script>
+        <![CDATA[
+        
+            import mx.validators.Validator;
+            import mx.events.ValidationResultEvent;
+            import mx.validators.ZipCodeValidatorDomainType;
+            import mx.controls.Alert;
+            import mx.core.Container;
+            
+ 
+            [Bindable]
+            private var validatorArr:Array;
+            
+            [Bindable]
+            private var formBackColor:uint = 0x1b1b1b;
+            
+            [Bindable]
+            private var radioRollOver:uint = 0xcccccc;
+            
+            private var questionsArray:Array = new Array();
+            private var answersArray:Array = new Array();
+            private var nodes:Array = new Array();
+            
+            private var urlvars:String = new String();
+           
+            
+            
+            private function init():void {
+            	
+                validatorArr = new Array();
+                validatorArr.push(zipCode_zipCodeValidator);
+                validatorArr.push(residence_numberValidator);
+                validatorArr.push(race_numberValidator);
+  
+
+            }
+           
+            
+       
+
+            public function validateForm(evt:MouseEvent):void {
+                var validatorErrorArray:Array = Validator.validateAll(validatorArr);;
+                var isValidForm:Boolean = validatorErrorArray.length == 0;
+                
+                if (age.selectedValue == null || gender.selectedValue == null) {
+                	Alert.show("Please fill out all required fields");
+                } else {
+                
+                if (isValidForm) {
+                	
+                		var tempXML:XML;
+                		tempXML = parentApplication.XMLData;
+                	
+  						// Adds result of Age question
+  						parentApplication._age = String(age.selectedValue);
+					    var _ageValue:String = String(age.selectedValue);
+						var _ageNodeString:String = '<survey question="Age" answer="' + _ageValue + '"/>';
+						//var _ageNode:XML = XML(_ageNodeString);
+						questionsArray.push("Age");
+						answersArray.push(_ageValue);
+						nodes.push(_ageNodeString);
+						
+						// Adds result of Gender question
+						parentApplication._gender = String(gender.selectedValue);
+						var _genderValue:String = String(gender.selectedValue);
+						var _genderNodeString:String = '<survey question="Gender" answer="' + _genderValue + '"/>';
+						//var _genderNode:XML = XML(_genderNodeString);
+						questionsArray.push("Gender");
+						answersArray.push(_genderValue);
+						nodes.push(_genderNodeString);
+						
+						// Adds result of Zip Code
+						parentApplication._zip = zipcode.text;
+						var _zipValue:String = zipcode.text;
+						var _zipNodeString:String = '<survey question="Zip Code" answer="' + _zipValue + '"/>';
+						//var _zipNode:XML = XML(_zipNodeString);
+						questionsArray.push("Zip");
+						answersArray.push(_zipValue);
+						nodes.push(_zipNodeString);
+						
+						// Adds result of Residence
+						parentApplication._residence = String(residence.selectedLabel);
+						var _resValue:String = String(residence.selectedLabel);
+						var _resNodeString:String = '<survey question="Residence" answer="' + _resValue + '"/>';
+						//var _resNode:XML = XML(_resNodeString);
+						questionsArray.push("Residence");
+						answersArray.push(_resValue);
+						nodes.push(_resNodeString);
+						
+						// Adds result of Race
+						parentApplication._race = String(race.selectedLabel);
+						var _raceValue:String = String(race.selectedLabel);
+						var _raceNodeString:String = '<survey question="Race" answer="' + _raceValue + '"/>';
+						//var _raceNode:XML = XML(_raceNodeString);
+						questionsArray.push("Race");
+						answersArray.push(_raceValue);
+						nodes.push(_raceNodeString);
+				
+						// Add the info to the Main XML
+						//parentApplication.XMLData.appendChild(_ageNode);
+						//parentApplication.XMLData.appendChild(_genderNode);
+						//parentApplication.XMLData.appendChild(_zipNode);
+						//parentApplication.XMLData.appendChild(_resNode);
+						//parentApplication.XMLData.appendChild(_raceNode);
+						
+						for (var i:int = 0; i < questionsArray.length; i++)
+						{
+							urlvars += questionsArray[i] + "=" + answersArray[i] + "&";
+							tempXML.appendChild(nodes[XML(i)]);
+						}
+			
+                    	// Go to the next Screen
+                   		parentApplication.recordSurvey(tempXML, urlvars);
+                   		
+                   
+                } else {
+                    var err:ValidationResultEvent;
+                    var errorMessageArray:Array = [];
+                    for each (err in validatorErrorArray) {
+                        var errField:String = FormItem(err.currentTarget.source.parent).label
+                        errorMessageArray.push(errField + ": " + err.message);
+                    }
+                    Alert.show(errorMessageArray.join("\n"), "Oops!  Houston, we have a problem:", Alert.OK);
+                }
+            }
+}
+            private function resetForm(evt:MouseEvent):void {
+                zipcode.text = "";
+                residence.selectedIndex = -1;
+                race.selectedIndex = -1;
+
+            }
+        ]]>
+    </mx:Script>
+
+	<!--  List of residence countries -->
+	
+    <mx:XMLList id="residenceXMLList">
+        <occupation label="USA" data="USA" />
+        <occupation label="Canada" data="Canada" />
+        <occupation label="Mexico" data="Mexico" />
+        <occupation label="Other" data="Other" />
+    </mx:XMLList>
+    
+    <!--  List of Races -->
+	
+    <mx:XMLList id="raceXMLList">
+        <occupation label="White/Caucasian" data="White/Caucasian" />
+        <occupation label="Latin/Hispanic" data="Latin/Hispanic" />
+        <occupation label="Asian/Pacific Islander" data="Asian/Pacific Islander" />
+        <occupation label="Black/African American" data="Black/African American" />
+        <occupation label="Other" data="Other" />
+    </mx:XMLList>
+    
+    <mx:Style>
+    .labelStyle {
+        fontSize: 11;
+        fontWeight: bold;
+    }
+    
+    .formTextStyle {
+        fontSize: 11;
+        
+    }
+	</mx:Style>	
+
+
+	<!--  Zip Code Validator -->
+	
+    <mx:ZipCodeValidator id="zipCode_zipCodeValidator"
+        source="{zipcode}"
+        property="text"
+        requiredFieldError="Please enter a zip code."
+        domain="{ZipCodeValidatorDomainType.US_OR_CANADA}"  />
+
+
+	<!--  Residence Validator -->
+	
+    <mx:NumberValidator id="residence_numberValidator"
+        source="{residence}"
+        lowerThanMinError="This field is required."
+        property="selectedIndex"
+        minValue="0" />
+        
+    <!--  Race Validator -->
+	
+    <mx:NumberValidator id="race_numberValidator"
+        source="{race}"
+        lowerThanMinError="This field is required."
+        property="selectedIndex"
+        minValue="0" />
+        
+        
+
+    <mx:Form verticalGap="20" color="0xFFFFFF">
+    
+        <!--<mx:FormHeading label="Please tell us about yourself" />-->
+        
+        		
+        <!--  Age Question -->
+        
+        <mx:FormItem required="true" label="Age" direction="horizontal" backgroundColor="{formBackColor}" labelStyleName="labelStyle">
+        <mx:RadioButtonGroup id="age"/>
+			<mx:RadioButton textRollOverColor="{radioRollOver}" useHandCursor="true" groupName="age" styleName="formTextStyle"
+		        id="one" 
+		        value="18-24" 
+		        label="18-24"/>
+		    <mx:RadioButton textRollOverColor="{radioRollOver}" useHandCursor="true" groupName="age" styleName="formTextStyle"
+		        id="two" 
+		        value="25-34" 
+		        label="25-34"/>
+		    <mx:RadioButton textRollOverColor="{radioRollOver}" useHandCursor="true" groupName="age" styleName="formTextStyle"
+		        id="three" 
+		        value="35-44" 
+		        label="35-44"/>
+		    <mx:RadioButton textRollOverColor="{radioRollOver}" useHandCursor="true" groupName="age" styleName="formTextStyle"
+		        id="four" 
+		        value="45-54" 
+		        label="45-54"/>
+		    <mx:RadioButton textRollOverColor="{radioRollOver}" useHandCursor="true" groupName="age" styleName="formTextStyle"
+		        id="five" 
+		        value="55-64" 
+		        label="55-64"/>
+		    <mx:RadioButton textRollOverColor="{radioRollOver}" useHandCursor="true" groupName="age" styleName="formTextStyle"
+		        id="six" 
+		        value="65 +" 
+		        label="65 +"/>
+		</mx:FormItem>
+		
+
+		
+		<!--  Gender Question -->
+		
+        <mx:FormItem required="true" label="Gender" direction="horizontal" backgroundColor="{formBackColor}" labelStyleName="labelStyle">
+            <mx:RadioButtonGroup id="gender" />
+			<mx:RadioButton textRollOverColor="{radioRollOver}" useHandCursor="true" groupName="gender"  styleName="formTextStyle"
+		        id="male" 
+		        value="male" 
+		        label="Male"/>
+		    <mx:RadioButton textRollOverColor="{radioRollOver}" useHandCursor="true" groupName="gender" styleName="formTextStyle"
+		        id="female" 
+		        value="female" 
+		        label="Female"/>
+        </mx:FormItem>
+        
+
+        
+        <!--  Zip Code Question -->
+        
+        <mx:FormItem required="true" label="Zip Code or Postal Code" backgroundColor="{formBackColor}" labelStyleName="labelStyle" >
+            <mx:TextInput id="zipcode" color="0x000000" styleName="formTextStyle"/>
+        </mx:FormItem>
+        
+
+        
+        <!--  Residence Question -->
+        
+        <mx:FormItem required="true" label="Residence" backgroundColor="{formBackColor}" labelStyleName="labelStyle">
+            <mx:ComboBox id="residence"  useHandCursor="true" prompt="Country of Residence" selectedIndex="-1" dataProvider="{residenceXMLList}" styleName="formTextStyle" labelField="@label" color="0x000000" />
+        </mx:FormItem>
+        
+
+        
+        <!--  Race Question -->
+        
+        <mx:FormItem required="true" label="What is your Background?" backgroundColor="{formBackColor}" labelStyleName="labelStyle">
+            <mx:ComboBox id="race" useHandCursor="true" prompt="What is your Background?" selectedIndex="-1" dataProvider="{raceXMLList}" labelField="@label" color="0x000000" styleName="formTextStyle"/>
+        </mx:FormItem>
+        
+        <mx:Spacer height="20" />
+        
+
+        <!--  Submit / Reset Buttons -->
+  
+        <mx:FormItem>
+            
+            <mx:Image id="zipPageButton" useHandCursor="true" toolTip="Next Page" buttonMode="true" source="assets/images/continue_button.png" click="validateForm(event)"/>
+               
+                <!--<mx:Button label="Reset" click="resetForm(event)" />-->
+
+        </mx:FormItem>
+        
+    </mx:Form>
+
+</mx:Module>
