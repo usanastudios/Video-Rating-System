@@ -16,7 +16,8 @@
 	backgroundGradientAlphas="[1.0, 1.0]" 
 	backgroundGradientColors="[#1B1B1B, #1B1B1B]" 
 	creationComplete="init(event)" 
-	xmlns:components="components.*">
+	xmlns:components="components.*"
+	xmlns:usana="com.usana.*">
    
    
    <!-- Set the CSS -->
@@ -56,28 +57,30 @@
 
 <mx:Script>
 	<![CDATA[
-	
-	//=================================================================================
-	//--- Import Classes
-	//=================================================================================
-	
-	import mx.controls.ProgressBar;
-	import modules.surveyForm;
-	import mx.controls.Text;
-	import flash.net.*;
-	import flash.events.*;
-	import flash.text.*;
-	import flash.utils.*;
-	import flash.display.*;
-	import mx.collections.ArrayCollection;
-	import com.GuN.UI.customUIComponent.slider.*;
-	import com.videoRating.utils.*;
-	import mx.controls.Alert;
-	import mx.managers.BrowserManager;
-    import mx.managers.IBrowserManager;
-    import mx.utils.URLUtil;
-    import mx.events.VideoEvent;
-    import mx.events.MetadataEvent;
+		import com.GuN.UI.customUIComponent.slider.*;
+		import com.videoRating.utils.*;
+		
+		import flash.display.*;
+		import flash.events.*;
+		import flash.net.*;
+		import flash.text.*;
+		import flash.utils.*;
+		
+		import mx.charts.series.AreaSeries;
+		import mx.charts.series.LineSeries;
+		import mx.charts.series.items.AreaSeriesItem;
+		import mx.controls.Alert;
+		import mx.controls.Text;
+		import mx.events.MetadataEvent;
+		import mx.events.VideoEvent;
+		import mx.managers.BrowserManager;
+		import mx.managers.IBrowserManager;
+		import mx.utils.URLUtil;
+		
+		private var startValues:Array;
+		private var activeSeries:AreaSeries;
+		private var activeLineSeries:LineSeries;
+		private var activePoint:AreaSeriesItem;
     //import fl.video.*;
     //import fl.video.MetadataEvent;
     
@@ -111,7 +114,7 @@
 	private var _timeLimit:Number = 3;
 	private var currentTime:Number = 0;
 	[Bindable]
-	private var streamURL:String = "rtmp://cp74021.edgefcs.net/ondemand/";
+	public var streamURL:String = "rtmp://cp74021.edgefcs.net/ondemand/";
 	[Bindable]
 	private var fileExt:String = ".flv";
 	private var _currentTime:Date;
@@ -144,7 +147,7 @@
 	private var arrayValues:Array = ["null","One", "Two", "Three", "Four", "Five", "Six", "Seven"];
 	private var urlVarData:String = new String();
 	private var surveyString:String = new String();
-	private var videoURL:String = new String();
+	public var videoURL:String = new String();
 	
 	[Bindable] public var _timestamp:String = new String();
 
@@ -199,12 +202,19 @@
 			   multOf5.push(5*i);
 			}
 			
+			
 	}
 	
+
+		
       private function loadXML(e:Event):void
       {
       	var xmlData:XML =  new XML(e.target.data);
-        videoURL = ParseXML(xmlData);   
+        videoURL = ParseXML(xmlData);  
+		
+		/* TEMPORARY FOR TESTING! */
+		//appStack.selectedIndex = 3;
+		
 
       }
 
@@ -450,7 +460,7 @@
 	
 	private function initChartData():void
 	{
-		chart.dataProvider = XMLData.snapshot;
+		//chart.dataProvider = XMLData.snapshot;
 		
 
 	}
@@ -511,7 +521,15 @@
 		
 	]]>
 </mx:Script>
-
+	
+	
+	<mx:Stroke id="lineStr" weight="7" />
+	
+	<mx:SolidColor id="threshold_OK" color="green" alpha="0.4" />
+	<mx:Stroke id="threshold_OK_str" color="green" weight="2" />
+	
+	<mx:SolidColor id="threshold_WARNING" color="#FFFF00" alpha="0.4" />
+	<mx:Stroke id="threshold_WARNING_str" color="#FFFF00" weight="2" />
 
 <!--  Slides the chart up  -->
 <mx:SeriesSlide id="slider" duration="2000" direction="up" />
@@ -650,70 +668,10 @@
 		</mx:VBox>
 			
 	</mx:Canvas>
+
+	<!--CHART COMPONENT-->
+	<usana:ResultChart id="chartScreen"/>
 	
-	<mx:Canvas id="chartScreen" creationComplete="initChartData()">
-	
-  <mx:Panel width="100%" color="0xFFFFFF" backgroundAlpha="0" borderStyle="none" paddingBottom="25" paddingLeft="35" paddingRight="35" paddingTop="25">
-  
-  <mx:Text styleName="headingStyle" text="Your Results" color="0xFFFFFF" />
-  
-     <mx:AreaChart id="chart" width="100%" showDataTips="true" backgroundElements="{chartBackground}" dataProvider="{XMLData.snapshot}" height="250" >
-
-        <mx:horizontalAxis>
-           <mx:CategoryAxis id="h1" categoryField="@time" title="Time"/>
-        </mx:horizontalAxis>
-       
-       <mx:verticalAxis>
-            <mx:LinearAxis minimum="0" maximum="7" title="Rating" />
-        </mx:verticalAxis>
-
-   
-        <mx:horizontalAxisRenderers>
-           <mx:AxisRenderer labelRotation="45" axis="{h1}" >
-             </mx:AxisRenderer>
-        </mx:horizontalAxisRenderers> 
-        
-        
-        <mx:series>
-		   <mx:AreaSeries yField="@rating" displayName="Rating" showDataEffect="{slider}" >
-		  
-                <mx:areaFill>
-                <mx:LinearGradient angle="90">
-                    <mx:entries>
-                        <mx:GradientEntry 
-                            color="0x3db7fd" 
-                            ratio="0"
-                            alpha="1"
-                        />
-                        <mx:GradientEntry 
-                            color="0x03375c" 
-                            ratio="1"
-                            alpha="1"
-                        />
-                 
-                    </mx:entries>
-                </mx:LinearGradient>
-            </mx:areaFill>
-
-		   </mx:AreaSeries>    
-        </mx:series>
-        
-     </mx:AreaChart>
-     
-     <mx:Spacer height="25" />
-     
-     <mx:HBox>
-     <mx:Spacer width="25" />
-     	<mx:Image source="assets/images/do-over.png" buttonMode="true" useHandCursor="true" click="doOver()" />
-     	
-     	<mx:Image source="assets/images/submit.png" buttonMode="true" useHandCursor="true" click="sendResults()" />
-     </mx:HBox>
-     
-
-     
-  </mx:Panel>
-  
-	</mx:Canvas>
 	
 	<mx:Canvas id="thankYou">
 	

@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"  show="init()">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.charts.events.ChartItemEvent;
+			import mx.charts.series.items.AreaSeriesItem;
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.Application;
+			import mx.rpc.xml.SimpleXMLDecoder;
+			import mx.utils.ArrayUtil;
+			
+			private var startValues:Array;
+			private var activeSeries:AreaSeries;
+			private var activePoint:AreaSeriesItem;
+			
+			
+			[Bindable] var testData:ArrayCollection;
+			[Bindable] var testXML:XML=
+				<snapshots>
+				<snapshot time="0:02" rating="4"/>
+				<snapshot time="0:05" rating="6"/>
+				<snapshot time="0:08" rating="7"/>
+				<snapshot time="0:11" rating="5"/>
+				<snapshot time="1:14" rating="5"/>
+			</snapshots>;
+			
+			
+			
+			private function convertXmlToArrayCollection( file:String ):ArrayCollection
+			{
+				var xml:XMLDocument = new XMLDocument( file );
+				
+				var decoder:SimpleXMLDecoder = new SimpleXMLDecoder();
+				var data:Object = decoder.decodeXML( xml );
+				var array:Array = ArrayUtil.toArray(data.snapshots.snapshot);
+				
+				return new ArrayCollection( array );
+			}
+			
+			
+			private function init():void{
+				
+				testData = convertXmlToArrayCollection(testXML);
+				videoPlayer.source = Application.application.streamURL + Application.application.videoURL;
+				videoPlayer.bufferTime = Math.round(Application.application._videoTime * .10);
+				videoPlayer.load();
+			}
+			
+			//=================================================================================
+			//--- Play/pause video
+			//=================================================================================
+			
+			public function playPauseVideo():void {
+				if (videoPlayer.playing) {
+					videoPlayer.pause();
+					playPause.setStyle("icon",Application.application.imagePlay);
+					
+					
+				} else {
+					videoPlayer.play();
+					playPause.setStyle("icon",Application.application.imagePause);
+					
+					
+				}
+			}
+			
+			
+			private function onSeriesMouseDown(event:MouseEvent):void {
+				
+				
+				
+				stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
+				
+				// calculate start values.
+				var initMouseY:Number= chart.mouseY;
+				
+				// create a bitmap to use as a drag image.
+				var seriesBitmapData:BitmapData = new BitmapData( event.currentTarget.width, event.currentTarget.height, true, 0x000000 );
+				seriesBitmapData.draw(event.currentTarget as DisplayObject);
+				img.source = new Bitmap(seriesBitmapData);
+				img.startDrag(false, new Rectangle(0, -100, 0, imgContainer.height));
+			}
+			
+			private function onStageMouseUp(event:MouseEvent):void {
+				// stopping the drag
+				img.stopDrag();
+				img.source = null;
+				stage.removeEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
+				
+				// calculate the delta and the new value.
+				// asign the values directly to the data provider.
+				for(var i:int = 0 ; i < testData.length ; i ++){
+				}
+				chart.dataProvider = testData;
+			}
+			
+			private function onItemMouseDown(event:ChartItemEvent):void {
+				if(event.hitData && event.hitData.element is AreaSeries){
+					activeSeries = event.hitData.element as AreaSeries;
+					activePoint = (event.hitData.chartItem as AreaSeriesItem);
+					stage.addEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMove_Item);
+					stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp_Item);
+					//videoPlayer.playheadTime = seekFormatter(activePoint.item.time);
+					var date:Date = new Date(null,null,null,null,activePoint.item.time.split(':')[0],activePoint.item.time.split(':')[1],null);
+				//	Alert.show(seekFormatter.format(date));
+				}
+			} 
+			
+			private function onStageMouseMove_Item(event:MouseEvent):void {
+				var tmpArr:Array = activeSeries.dataTransform.invertTransform(chart.mouseX, chart.mouseY);
+				
+				testData[activePoint.xNumber][activeSeries.yField] = Math.round(tmpArr[1]);
+				chart.dataProvider = testData;
+				
+			}
+			
+			private function onStageMouseUp_Item(event:MouseEvent):void {
+				stage.removeEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMove_Item);
+				stage.removeEventListener(MouseEvent.MOUSE_UP, onStageMouseUp_Item);
+				
+			}
+			
+		]]>
+	</mx:Script>
+	
+	
+	<!--  Slides the chart up  -->
+	<mx:SeriesSlide id="slider" duration="2000" direction="up" />
+	
+	<!--  Formats the video time  -->
+	<mx:DateFormatter id="dateFormatter" formatString="NN:SS" />
+	
+	<mx:DateFormatter id="seekFormatter" formatString="SS" />
+	
+	<!--  Styles the chart background  -->
+	<mx:Array id="chartBackground">
+		<mx:GridLines verticalChangeCount="1" direction="horizontal" >
+			
+			<mx:horizontalStroke>
+				<mx:Stroke weight="1" alpha=".10" color="0xFFFFFF"/>
+			</mx:horizontalStroke>
+			
+			<mx:horizontalFill>
+				<mx:SolidColor color="0x000000" alpha=".10"/>
+			</mx:horizontalFill>
+			
+		</mx:GridLines>
+	</mx:Array>
+	
+	<mx:Stroke id="lineStr" weight="7" />
+	
+	<mx:SolidColor id="threshold_OK" color="green" alpha="0.4" />
+	<mx:Stroke id="threshold_OK_str" color="green" weight="2" />
+	
+	<mx:SolidColor id="threshold_WARNING" color="#FFFF00" alpha="0.4" />
+	<mx:Stroke id="threshold_WARNING_str" color="#FFFF00" weight="2" />
+	
+	<mx:Panel width="100%" color="0xFFFFFF" backgroundAlpha="0" borderStyle="none" paddingBottom="25" paddingLeft="35" paddingRight="35" paddingTop="25">
+	
+		<mx:HBox>
+			<mx:Text styleName="headingStyle" text="Your Results" color="0xFFFFFF" />
+
+			<mx:Panel id="panel" horizontalCenter="0" borderColor="0x000000" borderAlpha=".3">
+				
+				<mx:VideoDisplay id="videoPlayer" 
+								 autoPlay="false" 
+								 height="240" 
+								 width="320"
+								 />
+				
+				<mx:ControlBar>         
+					<mx:Button id="playPause" fillAlphas="{[0.1,0.1]}" borderColor="0x222222" useHandCursor="true" buttonMode="true" color="0x000000" icon="@Embed(source='assets/images/play.png')" click="playPauseVideo()"  />
+					<mx:Spacer width="100%" />
+					<mx:Label id="playheadTime" fontWeight="bold" color="0xFFFFFF"/>
+				</mx:ControlBar>
+				
+			</mx:Panel>
+		</mx:HBox>
+		
+	<mx:AreaChart id="chart" height="250" width="100%"
+					  showDataTips="true" dataProvider="{testData}"
+					  itemMouseDown="onItemMouseDown(event)"
+					  seriesFilters="[]"  backgroundElements="{chartBackground}" >
+			
+			<mx:horizontalAxis>
+				<mx:CategoryAxis id="h1" categoryField="time" title="Time"/>
+			</mx:horizontalAxis>
+			
+			<mx:verticalAxis>
+				<mx:LinearAxis minimum="0" maximum="7" title="Rating" />
+			</mx:verticalAxis>
+			<mx:horizontalAxisRenderers>
+				<mx:AxisRenderer labelRotation="45" axis="{h1}">
+				</mx:AxisRenderer>
+			</mx:horizontalAxisRenderers> 
+			
+			
+			<mx:series>
+				<mx:AreaSeries yField="rating" displayName="Rating">
+					<mx:areaFill>
+						<mx:LinearGradient angle="90">
+							<mx:entries>
+								<mx:GradientEntry 
+									color="0x3db7fd" 
+									ratio="0"
+									alpha="1"
+									/>
+								<mx:GradientEntry 
+									color="0x03375c" 
+									ratio="1"
+									alpha="1"
+									/>
+								
+							</mx:entries>
+						</mx:LinearGradient>
+					</mx:areaFill>
+				</mx:AreaSeries>
+				<mx:AreaSeries yField="time" displayName="OK" />
+				
+			</mx:series>
+			<mx:annotationElements>
+				<mx:Canvas id="imgContainer">
+					<mx:Image id="img" alpha="0.5" top="0" />
+				</mx:Canvas>
+			</mx:annotationElements>
+			
+		</mx:AreaChart>
+		<mx:Spacer height="25" />
+		
+		<mx:HBox>
+			<mx:Spacer width="25" />
+			<mx:Image source="assets/images/do-over.png" buttonMode="true" useHandCursor="true" click="Application.application.doOver()" />
+			
+			<mx:Image source="assets/images/submit.png" buttonMode="true" useHandCursor="true" click="Application.application.sendResults()" />
+			
+			
+			
+			
+		</mx:HBox>
+</mx:Panel>
+	
+</mx:VBox>
