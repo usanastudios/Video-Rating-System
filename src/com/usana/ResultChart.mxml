@@ -7,7 +7,6 @@
 			import mx.charts.events.ChartItemEvent;
 			import mx.charts.series.items.AreaSeriesItem;
 			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
 			import mx.core.Application;
 			import mx.rpc.xml.SimpleXMLDecoder;
 			import mx.utils.ArrayUtil;
@@ -18,32 +17,30 @@
 			
 			
 			[Bindable] var testData:ArrayCollection;
-			[Bindable] var testXML:XML=
-				<snapshots>
-				<snapshot time="0:02" rating="4"/>
-				<snapshot time="0:05" rating="6"/>
-				<snapshot time="0:08" rating="7"/>
-				<snapshot time="0:11" rating="5"/>
-				<snapshot time="1:14" rating="5"/>
-			</snapshots>;
+//			[Bindable] var testXML:XML=
+//				<snapshots>
+//				<snapshot time="0:02" rating="4"/>
+//				<snapshot time="0:05" rating="6"/>
+//				<snapshot time="0:08" rating="7"/>
+//				<snapshot time="0:11" rating="5"/>
+//				<snapshot time="1:14" rating="5"/>
+//			</snapshots>;
 			
 			
 			
 			private function convertXmlToArrayCollection( file:String ):ArrayCollection
 			{
 				var xml:XMLDocument = new XMLDocument( file );
-				
 				var decoder:SimpleXMLDecoder = new SimpleXMLDecoder();
 				var data:Object = decoder.decodeXML( xml );
-				var array:Array = ArrayUtil.toArray(data.snapshots.snapshot);
-				
+				var array:Array = ArrayUtil.toArray(data.results.snapshot);
 				return new ArrayCollection( array );
 			}
 			
 			
 			private function init():void{
 				
-				testData = convertXmlToArrayCollection(testXML);
+				testData = convertXmlToArrayCollection(Application.application.XMLData);
 				videoPlayer.source = Application.application.streamURL + Application.application.videoURL;
 				videoPlayer.bufferTime = Math.round(Application.application._videoTime * .10);
 				videoPlayer.load();
@@ -103,9 +100,16 @@
 					activePoint = (event.hitData.chartItem as AreaSeriesItem);
 					stage.addEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMove_Item);
 					stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp_Item);
-					//videoPlayer.playheadTime = seekFormatter(activePoint.item.time);
-					var date:Date = new Date(null,null,null,null,activePoint.item.time.split(':')[0],activePoint.item.time.split(':')[1],null);
-				//	Alert.show(seekFormatter.format(date));
+					var mins:Number = activePoint.item.time.split(':')[0];
+					var secs:Number = activePoint.item.time.split(':')[1];
+					var seekTime:Number = secs;
+					if(mins > 0)
+					{
+						
+						seekTime = secs + (mins * 60);
+					}
+					videoPlayer.playheadTime = seekTime;
+				    playPauseVideo();
 				}
 			} 
 			
@@ -163,24 +167,10 @@
 		<mx:HBox>
 			<mx:Text styleName="headingStyle" text="Your Results" color="0xFFFFFF" />
 
-			<mx:Panel id="panel" horizontalCenter="0" borderColor="0x000000" borderAlpha=".3">
-				
-				<mx:VideoDisplay id="videoPlayer" 
-								 autoPlay="false" 
-								 height="240" 
-								 width="320"
-								 />
-				
-				<mx:ControlBar>         
-					<mx:Button id="playPause" fillAlphas="{[0.1,0.1]}" borderColor="0x222222" useHandCursor="true" buttonMode="true" color="0x000000" icon="@Embed(source='assets/images/play.png')" click="playPauseVideo()"  />
-					<mx:Spacer width="100%" />
-					<mx:Label id="playheadTime" fontWeight="bold" color="0xFFFFFF"/>
-				</mx:ControlBar>
-				
-			</mx:Panel>
 		</mx:HBox>
 		
-	<mx:AreaChart id="chart" height="250" width="100%"
+		<mx:HBox width="100%">
+	<mx:AreaChart id="chart" height="350" width="75%"
 					  showDataTips="true" dataProvider="{testData}"
 					  itemMouseDown="onItemMouseDown(event)"
 					  seriesFilters="[]"  backgroundElements="{chartBackground}" >
@@ -228,6 +218,23 @@
 			</mx:annotationElements>
 			
 		</mx:AreaChart>
+			
+			<mx:Panel id="panel" horizontalCenter="0" borderColor="0x000000" borderAlpha=".3">
+				
+				<mx:VideoDisplay id="videoPlayer" 
+								 autoPlay="false" 
+								 height="240" 
+								 width="320"
+								 />
+				
+				<mx:ControlBar>         
+					<mx:Button id="playPause" fillAlphas="{[0.1,0.1]}" borderColor="0x222222" useHandCursor="true" buttonMode="true" color="0x000000" icon="@Embed(source='assets/images/play.png')" click="playPauseVideo()"  />
+					<mx:Spacer width="100%" />
+					<mx:Label id="playheadTime" fontWeight="bold" color="0xFFFFFF"/>
+				</mx:ControlBar>
+				
+			</mx:Panel>
+			</mx:HBox>
 		<mx:Spacer height="25" />
 		
 		<mx:HBox>

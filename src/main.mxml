@@ -385,7 +385,7 @@
 	//--- Called when the user wants to retake the video portion
 	//=================================================================================
 	
-	private function doOver():void
+	public function doOver():void
 	{
 		appStack.selectedChild=videoScreen;
 		urlVarData = surveyString;
@@ -415,7 +415,7 @@
 	//--- Sends the XML data to the sendEmail Class
 	//=================================================================================
 	
-	private function sendResults():void
+	public function sendResults():void
 	{
 		
 		uniqueID = userID;
