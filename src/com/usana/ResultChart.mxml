@@ -5,6 +5,7 @@
 	<mx:Script>
 		<![CDATA[
 			import mx.charts.events.ChartItemEvent;
+			import mx.charts.renderers.CircleItemRenderer;
 			import mx.charts.series.items.AreaSeriesItem;
 			import mx.collections.ArrayCollection;
 			import mx.core.Application;
@@ -16,7 +17,7 @@
 			private var activePoint:AreaSeriesItem;
 			
 			
-			[Bindable] var testData:ArrayCollection;
+			[Bindable] var resultData:ArrayCollection;
 //			[Bindable] var testXML:XML=
 //				<snapshots>
 //				<snapshot time="0:02" rating="4"/>
@@ -40,10 +41,11 @@
 			
 			private function init():void{
 				
-				testData = convertXmlToArrayCollection(Application.application.XMLData);
+				resultData = convertXmlToArrayCollection(Application.application.XMLData);
 				videoPlayer.source = Application.application.streamURL + Application.application.videoURL;
 				videoPlayer.bufferTime = Math.round(Application.application._videoTime * .10);
 				videoPlayer.load();
+				series.setStyle('itemRenderer', new ClassFactory(CircleItemRenderer));
 			}
 			
 			//=================================================================================
@@ -89,9 +91,9 @@
 				
 				// calculate the delta and the new value.
 				// asign the values directly to the data provider.
-				for(var i:int = 0 ; i < testData.length ; i ++){
+				for(var i:int = 0 ; i < resultData.length ; i ++){
 				}
-				chart.dataProvider = testData;
+				chart.dataProvider = resultData;
 			}
 			
 			private function onItemMouseDown(event:ChartItemEvent):void {
@@ -108,16 +110,25 @@
 						
 						seekTime = secs + (mins * 60);
 					}
+					videoPlayer.play();
 					videoPlayer.playheadTime = seekTime;
-				    playPauseVideo();
+					if(videoPlayer.playing == true)
+					{
+						playPause.setStyle("icon",Application.application.imagePlay);
+					}
+					else
+					{
+						playPause.setStyle("icon",Application.application.imagePause);
+					}
+
 				}
 			} 
 			
 			private function onStageMouseMove_Item(event:MouseEvent):void {
 				var tmpArr:Array = activeSeries.dataTransform.invertTransform(chart.mouseX, chart.mouseY);
 				
-				testData[activePoint.xNumber][activeSeries.yField] = Math.round(tmpArr[1]);
-				chart.dataProvider = testData;
+				resultData[activePoint.xNumber][activeSeries.yField] = Math.round(tmpArr[1]);
+				chart.dataProvider = resultData;
 				
 			}
 			
@@ -171,7 +182,7 @@
 		
 		<mx:HBox width="100%">
 	<mx:AreaChart id="chart" height="350" width="75%"
-					  showDataTips="true" dataProvider="{testData}"
+					  showDataTips="true" dataProvider="{resultData}"
 					  itemMouseDown="onItemMouseDown(event)"
 					  seriesFilters="[]"  backgroundElements="{chartBackground}" >
 			
@@ -189,7 +200,7 @@
 			
 			
 			<mx:series>
-				<mx:AreaSeries yField="rating" displayName="Rating">
+				<mx:AreaSeries yField="rating" displayName="Rating" id="series">
 					<mx:areaFill>
 						<mx:LinearGradient angle="90">
 							<mx:entries>
@@ -239,8 +250,8 @@
 		
 		<mx:HBox>
 			<mx:Spacer width="25" />
-			<mx:Image source="assets/images/do-over.png" buttonMode="true" useHandCursor="true" click="Application.application.doOver()" />
-			
+<!--			<mx:Image source="assets/images/do-over.png" buttonMode="true" useHandCursor="true" click="Application.application.doOver()" />
+-->			
 			<mx:Image source="assets/images/submit.png" buttonMode="true" useHandCursor="true" click="Application.application.sendResults()" />
 			
 			
