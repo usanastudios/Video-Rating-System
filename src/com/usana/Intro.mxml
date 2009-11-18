@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%">
+	
+	<mx:Script><![CDATA[ import mx.core.Application; ]]></mx:Script>
+
+	<mx:VBox horizontalAlign="center" width="100%" verticalGap="30">
+	<mx:Spacer width="100%" height="50" />
+	<mx:Text  text="Video Rating System" color="0xFFFFFF" fontSize="24" horizontalCenter="0"/>
+		<mx:Button label="Proceed to Survey"  click="{Application.application.appStack.selectedIndex = 1}"/>
+		<mx:Button label="Login to Admin Panel" />
+	</mx:VBox>
+		
+		
+	</mx:Canvas>
