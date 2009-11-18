@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%">
+	
+	<mx:Script><![CDATA[ import mx.core.Application; ]]></mx:Script>
+	
+	<mx:Panel id="tutorialPanel" layout="absolute" width="100%" backgroundAlpha="0" borderStyle="none" >
+	
+			<mx:VBox id="tutBox" x="{(tutorialPanel.width/2-tutBox.width/2)}" y="50">
+			
+			<mx:SWFLoader id="tutSWF" source="assets/swf/tutorial.swf" />
+	
+					<mx:Text textAlign="center" fontSize="14" text="As you watch a video drag the slider as shown above. Dragging to the right indicates you like what you see while dragging to the left indicates dislike. You must use the slider to receive credit for viewing the video. Click Continue to begin." color="0xFFFFFF" width="{tutSWF.width}" />
+				
+					<mx:Spacer height="25" />
+				
+			</mx:VBox>
+			
+		</mx:Panel>
+		
+	<mx:Image source="assets/images/continue_button.png" buttonMode="true" useHandCursor="true" click="{Application.application.appStack.selectedChild=Application.application.videoScreen}" horizontalCenter="0" y="385" />
+		
+	</mx:Canvas>

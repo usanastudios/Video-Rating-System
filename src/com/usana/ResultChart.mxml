@@ -17,17 +17,7 @@
 			private var activePoint:AreaSeriesItem;
 			
 			
-			[Bindable] var resultData:ArrayCollection;
-//			[Bindable] var testXML:XML=
-//				<snapshots>
-//				<snapshot time="0:02" rating="4"/>
-//				<snapshot time="0:05" rating="6"/>
-//				<snapshot time="0:08" rating="7"/>
-//				<snapshot time="0:11" rating="5"/>
-//				<snapshot time="1:14" rating="5"/>
-//			</snapshots>;
-			
-			
+			[Bindable] private var resultData:ArrayCollection;
 			
 			private function convertXmlToArrayCollection( file:String ):ArrayCollection
 			{
@@ -55,12 +45,12 @@
 			public function playPauseVideo():void {
 				if (videoPlayer.playing) {
 					videoPlayer.pause();
-					playPause.setStyle("icon",Application.application.imagePlay);
+					playPause.setStyle("icon",Application.application.videoScreen.imagePlay);
 					
 					
 				} else {
 					videoPlayer.play();
-					playPause.setStyle("icon",Application.application.imagePause);
+					playPause.setStyle("icon",Application.application.videoScreen.imagePause);
 					
 					
 				}
@@ -114,11 +104,11 @@
 					videoPlayer.playheadTime = seekTime;
 					if(videoPlayer.playing == true)
 					{
-						playPause.setStyle("icon",Application.application.imagePlay);
+						playPause.setStyle("icon",Application.application.videoScreen.imagePlay);
 					}
 					else
 					{
-						playPause.setStyle("icon",Application.application.imagePause);
+						playPause.setStyle("icon",Application.application.videoScreen.imagePause);
 					}
 
 				}
@@ -239,7 +229,7 @@
 								 />
 				
 				<mx:ControlBar>         
-					<mx:Button id="playPause" fillAlphas="{[0.1,0.1]}" borderColor="0x222222" useHandCursor="true" buttonMode="true" color="0x000000" icon="@Embed(source='assets/images/play.png')" click="playPauseVideo()"  />
+					<mx:Button id="playPause" fillAlphas="{[0.1,0.1]}" borderColor="0x222222" useHandCursor="true" buttonMode="true" color="0x000000" icon="@Embed(source='../../assets/images/play.png')" click="playPauseVideo()"  />
 					<mx:Spacer width="100%" />
 					<mx:Label id="playheadTime" fontWeight="bold" color="0xFFFFFF"/>
 				</mx:ControlBar>

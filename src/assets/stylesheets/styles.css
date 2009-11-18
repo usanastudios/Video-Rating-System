@@ -1,0 +1,29 @@
+ .headingStyle {
+        fontFamily:Arial; 
+        fontSize: 60pt;
+        fontWeight: bold;
+        letterSpacing: -3;
+    }
+    
+   .pStyle {
+   	
+ 		fontFamily:Arial; 
+        fontSize: 13pt;
+        leading: 10;
+
+   }
+   
+   @font-face{
+    src: url("assets/fonts/Calibri.ttf");
+    fontFamily: myMyriad;
+ }
+
+ AreaChart {
+    fontFamily: myMyriad;
+    fontSize: 11; 
+ }
+ 
+ Alert {
+ background-color: #000000;	
+ border-color: #000000;
+ }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" >
+	
+		<mx:Panel id="surveyPanel" height="700" paddingLeft="25" x="0" y="0" backgroundAlpha="0" borderStyle="none">
+		
+		<mx:Text styleName="headingStyle" text="Tell us a little about yourself." color="0xFFFFFF" />
+		
+		<mx:HBox paddingTop="25" horizontalGap="20">
+			
+			<mx:Box cornerRadius="8" borderStyle="solid" borderThickness="0" backgroundColor="0x111111" paddingTop="18" paddingBottom="18" paddingLeft="18" paddingRight="18">
+				
+			<mx:Text width="250" color="0xbbbbbb" styleName="pStyle" text="Welcome to uRate, USANA’s online video rating system. Please disable all popup blockers, complete the short survey and click Continue. " />
+			
+			</mx:Box>
+		
+			<mx:ModuleLoader id="surveyModule" url="modules/surveyForm.swf"/>
+			
+			<!--<mx:Button id="skip" click="{appStack.selectedChild = tutorial}" label="Skip this crap"/>-->
+			
+			
+			</mx:HBox>
+			
+		</mx:Panel>
+	
+</mx:Canvas>

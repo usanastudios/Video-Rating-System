@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" >
+		<mx:Script><![CDATA[ 
+		
+		
+		import mx.core.Application;
+
+			[Embed(source='../../assets/images/play.png')]
+				[Bindable]
+				public var imagePlay:Class; 
+				[Embed(source='../../assets/images/pause.png')]
+				[Bindable]
+				public var imagePause:Class;
+		
+		
+		 ]]></mx:Script>
+		
+		<mx:VBox id="videoPanel" creationComplete="Application.application.createFLVPlayer()" width="100%">
+			
+				<mx:Panel layout="absolute" width="100%" backgroundAlpha="0" borderStyle="none" height="700" >
+				
+					<mx:Panel id="panel" horizontalCenter="0" borderColor="0x000000" borderAlpha=".3">
+
+				    <mx:VideoDisplay id="videoPlayer" 
+				            playheadUpdate="Application.application.updatePlayhead(event)"
+				            autoPlay="false" 
+				            metadataReceived="Application.application.getDuration(event)"
+				            stateChange="Application.application.videoDisplay_stateChange(event)" 
+				            complete="Application.application.videoComplete(event)"
+				            height="240" 
+				            width="320"
+				            />
+				            
+				            <mx:ControlBar>         
+				            <mx:Button id="playPause" fillAlphas="{[0.1,0.1]}" borderColor="0x222222" useHandCursor="true" buttonMode="true" color="0x000000" icon="@Embed(source='../../assets/images/play.png')" click="Application.application.playPauseVideo()" />
+				            <mx:Spacer width="100%" />
+				            <mx:Label id="playheadTime" fontWeight="bold" color="0xFFFFFF"/>
+				        </mx:ControlBar>
+				        
+				    </mx:Panel>
+				
+
+				<mx:Spacer height="25" />
+				
+					<mx:HBox horizontalCenter="0" y="{videoPlayer.y + 330}">
+						
+						<mx:Text color="0xFFFFFF" text="Dislike" fontSize="14" />
+					
+						<mx:Image source="assets/images/ratingScale.png" />
+					
+					<mx:Text color="0xFFFFFF" text="Like" fontSize="14" />
+					
+					</mx:HBox>
+					
+				<mx:HSlider id="hSlider"
+						showDataTip="false" 
+						buttonMode="true"
+						values="{Application.application.arrayValues}"
+						creationComplete="{hSlider.value=4}"
+						
+						minimum="1"
+						maximum="{Application.application.arrayValues.length-1}"
+						liveDragging="true" 
+						trackSkin="com.GuN.UI.customUIComponent.slider.SliderTrack"
+						sliderThumbClass="com.GuN.UI.customUIComponent.slider.CSpSliderThumb" 
+						useHandCursor="true"
+						width="500" horizontalCenter="0" y="{videoPlayer.y + 400}"
+						/>
+				
+				<mx:Text textAlign="center" fontSize="12" text="Please wait while the video loads. This may take several minutes depending on the length of the video. When the video is loaded, press the play button to rate it." color="0xFFFFFF" x="{hSlider.x}" y="{hSlider.y + 55}" width="500" />
+		
+		
+				</mx:Panel>
+				
+				
+		</mx:VBox>
+			
+	</mx:Canvas>
