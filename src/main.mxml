@@ -505,6 +505,8 @@
 	<!--THANK YOU -->
 	<usana:ThankYou id="thankYou" />
 
+	<!--ADMIN SCREEN-->
+	<usana:AdminScreen id="adminScreen" />
 	
 </mx:ViewStack>
 	

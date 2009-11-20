@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.core.Application;
+			import mx.events.CloseEvent;
+			
+			// Define variable to hold the Alert object. 
+			public var deleteAlert:Alert;
+			private var deleteID:Number;
+			
+			//FUNCTION TO OPEN ALERT BOX BEFORE DELETE
+			public function openAlert(id:Number,project_name:String):void {
+				deleteID = id;
+				Alert.show('Delete '+project_name+'?', 'Confirm Delete',
+					Alert.OK | Alert.CANCEL, this,
+					Application.application.adminScreen.alertListener, null, Alert.OK);
+			}
+			
+			//LISTENER FUNCTION TO CONFIRM USER WANTS TO DELETE
+			public function alertListener(eventObj:CloseEvent):void {
+				// Check to see if the OK button was pressed.
+				if (eventObj.detail==Alert.OK) {
+					deleteProject_svc.send({id:deleteID}); 
+				}
+			}
+			
+		
+			
+		]]>
+	</mx:Script>
+	
+	
+	<mx:HTTPService id="projectList_svc" url="http://www.usanamedia.com/uRate/results/project_list_xml.php" 
+					resultFormat="e4x" 
+					fault="mx.controls.Alert.show(event.fault.message)" 
+					showBusyCursor="true" />
+		
+	<mx:HTTPService id="deleteProject_svc" url="http://www.usanamedia.com/uRate/results/delete_project.php" 
+					fault="mx.controls.Alert.show(event.fault.message)" 
+					result="projectList_svc.send()"
+					showBusyCursor="true" />
+					
+	<mx:Button x="132" y="36" label="Create New Project"/>
+	<mx:DataGrid id="projectsDG" left="123" top="66" bottom="10" right="124" dataProvider="{projectList_svc.lastResult.project}">
+		<mx:columns>
+			<mx:DataGridColumn headerText="Project Name" dataField="project_name"/>
+			<mx:DataGridColumn headerText="Date Created" dataField="date_created" width="200"/>
+			<mx:DataGridColumn headerText="Responses" dataField="results" width="100"/>
+			<mx:DataGridColumn headerText="Active" dataField="active" width="50">
+				<mx:itemRenderer>
+				<mx:Component>
+					<mx:CheckBox selected="{(data.active == '1')?true:false}"/>
+				</mx:Component>
+				</mx:itemRenderer>
+			</mx:DataGridColumn>
+			<mx:DataGridColumn headerText="Delete" width="100">
+				<mx:itemRenderer>
+					<mx:Component>
+						<mx:LinkButton label="Delete"  color="blue"  click="Application.application.adminScreen.openAlert(data.id,data.project_name)">
+							<mx:Script>
+								<![CDATA[
+									import mx.controls.Alert;
+									import mx.core.Application;
+									import mx.events.ListEvent;
+									
+								]]>
+							</mx:Script>
+						</mx:LinkButton>
+
+					</mx:Component>
+				</mx:itemRenderer>
+			</mx:DataGridColumn>
+		</mx:columns>
+	</mx:DataGrid>
+	
+</mx:Canvas>
